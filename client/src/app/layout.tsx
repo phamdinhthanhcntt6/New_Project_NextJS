@@ -3,6 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/ui/header";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+const clientQuery = new QueryClient();
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        {/* <QueryClientProvider client={clientQuery}> */}
+        <Toaster />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -28,6 +33,7 @@ export default function RootLayout({
           <Header />
           {children}
         </ThemeProvider>
+        {/* </QueryClientProvider> */}
       </body>
     </html>
   );

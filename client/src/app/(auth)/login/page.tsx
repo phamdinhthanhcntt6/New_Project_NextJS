@@ -1,6 +1,13 @@
-import { ModeToggle } from "@/components/mode-toggle";
+import LoginForm from "@/app/(auth)/login/login-form";
 
 const LoginPage = () => {
-  return <div>LoginPage</div>;
+  return (
+    <div className="">
+      LoginPage
+      <div className="flex justify-center">
+        <LoginForm />
+      </div>
+    </div>
+  );
 };
 export default LoginPage;

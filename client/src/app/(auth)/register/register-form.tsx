@@ -9,13 +9,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import envConfig from "@/config";
 import {
   RegisterBody,
   RegisterBodyType,
 } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { axiosInstance } from "../../../../apiConfig";
+import envConfig from "@/config";
 
 const RegisterForm = () => {
   const form = useForm<RegisterBodyType>({
@@ -28,7 +30,6 @@ const RegisterForm = () => {
     },
   });
 
-  // 2. Define a submit handler.
   async function onSubmit(values: RegisterBodyType) {
     const res = await fetch(
       `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/register`,
@@ -45,6 +46,25 @@ const RegisterForm = () => {
         console.log(error);
       });
   }
+
+  // const createAccount = async (data: RegisterBodyType) => {
+  //   await axiosInstance.post("/auth/register", data);
+  // };
+
+  // const createAccountMutation = useMutation({
+  //   mutationFn: createAccount,
+  //   onSuccess: () => {
+  //     console.log("Thành công");
+  //   },
+  //   onError: () => {
+  //     console.log("Thất bại");
+  //   },
+  // });
+
+  // const onSubmit = async (values: RegisterBodyType) => {
+  //   createAccountMutation.mutate(values);
+  // };
+
   return (
     <div className="w-full flex flex-col max-md:p-4">
       <span className="text-center font-bold text-2xl text-[#272E3F]">
@@ -112,7 +132,7 @@ const RegisterForm = () => {
             )}
           />
           <Button type="submit" className="w-32 mx-auto !mt-8">
-            Submit
+            Register
           </Button>
         </form>
       </Form>
