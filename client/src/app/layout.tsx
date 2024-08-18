@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import { AppProvider } from "@/app/AppProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/ui/header";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-const clientQuery = new QueryClient();
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { cookies } from "next/headers";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,10 +19,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+
+  const sessionToken = cookieStore.get("sessionToken");
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {/* <QueryClientProvider client={clientQuery}> */}
         <Toaster />
         <ThemeProvider
           attribute="class"
@@ -31,9 +34,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          {children}
+          <AppProvider initialSessionToken={sessionToken?.value}>
+            {children}
+          </AppProvider>
         </ThemeProvider>
-        {/* </QueryClientProvider> */}
       </body>
     </html>
   );

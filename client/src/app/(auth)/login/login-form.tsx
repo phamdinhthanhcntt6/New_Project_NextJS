@@ -1,4 +1,5 @@
 "use client";
+import { useAppContext } from "@/app/AppProvider";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,15 +10,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import envConfig from "@/config";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useToast } from "@/components/ui/use-toast";
 
 const LoginForm = () => {
   const { toast } = useToast();
-
+  const { setSessionToken } = useAppContext();
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -28,7 +29,7 @@ const LoginForm = () => {
 
   async function onSubmit(values: LoginBodyType) {
     try {
-      const res = await fetch(
+      const result = await fetch(
         `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/login`,
         {
           body: JSON.stringify(values),
@@ -49,8 +50,10 @@ const LoginForm = () => {
         return data;
       });
       toast({
-        description: res.payload.message,
+        description: result.payload.message,
       });
+
+      setSessionToken(result.payload.data.token);
     } catch (error: any) {
       const errors = error.payload.errors as {
         feild: string;

@@ -4,19 +4,16 @@ export const POST = async (request: Request) => {
   const sesstionToken = res.payload?.data?.token;
   if (!sesstionToken) {
     return Response.json(
-      { message: "khong nhan dc session token" },
+      { message: "Unable to receive session token" },
       {
         status: 400,
       }
     );
   }
-  return Response.json(
-    { res },
-    {
-      status: 200,
-      headers: {
-        "Set-Cookie": `sessionToken=${sesstionToken}`,
-      },
-    }
-  );
+  return Response.json(res.payload, {
+    status: 200,
+    headers: {
+      "Set-Cookie": `sessionToken=${sesstionToken}; Path=/; HttpOnly`,
+    },
+  });
 };
