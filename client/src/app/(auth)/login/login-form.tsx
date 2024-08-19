@@ -1,5 +1,5 @@
 "use client";
-import { useAppContext } from "@/app/AppProvider";
+import authApiRequest from "@/apiRequest/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,15 +11,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import envConfig from "@/config";
+import { clientSessionToken } from "@/lib/http";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { cookies } from "next/headers";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 const LoginForm = () => {
   const { toast } = useToast();
-  const { setSessionToken, sessionToken } = useAppContext();
+  const router = useRouter();
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -30,50 +30,12 @@ const LoginForm = () => {
 
   async function onSubmit(values: LoginBodyType) {
     try {
-      const result = await fetch(
-        `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/login`,
-        {
-          body: JSON.stringify(values),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-        }
-      ).then(async (res) => {
-        const payload = await res.json();
-        const data = {
-          status: res.status,
-          payload,
-        };
-        if (!res.ok) {
-          throw data;
-        }
-        return data;
-      });
+      const result = await authApiRequest.login(values);
       toast({
         description: result.payload.message,
       });
-      const resultFromNextServer = await fetch("/api/auth", {
-        method: "POST",
-        body: JSON.stringify(result),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then(async (res) => {
-        const payload = await res.json();
-        const data = {
-          status: res.status,
-          payload,
-        };
-        if (!res.ok) {
-          throw data;
-        }
-        return data;
-      });
-
-      setSessionToken(resultFromNextServer.payload.data.token);
-
-      console.log(sessionToken);
+      await authApiRequest.auth({ sessionToken: result.payload.data.token });
+      router.push("/me");
     } catch (error: any) {
       const errors = error.payload.errors as {
         feild: string;
@@ -108,7 +70,7 @@ const LoginForm = () => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-2 w-1/3 flex flex-col mx-auto justify-center max-md:w-full "
+          className="space-y-2 w-1/3 flex flex-col mx-auto justify-center max-md:w-full"
         >
           <FormField
             control={form.control}

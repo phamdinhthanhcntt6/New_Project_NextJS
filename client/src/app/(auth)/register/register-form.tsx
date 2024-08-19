@@ -1,4 +1,5 @@
 "use client";
+import authApiRequest from "@/apiRequest/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,15 +10,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { clientSessionToken } from "@/lib/http";
 import {
   RegisterBody,
   RegisterBodyType,
 } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { axiosInstance } from "../../../../apiConfig";
-import envConfig from "@/config";
 
 const RegisterForm = () => {
   const form = useForm<RegisterBodyType>({
@@ -30,21 +31,41 @@ const RegisterForm = () => {
     },
   });
 
+  const { toast } = useToast();
+  const router = useRouter();
+
   async function onSubmit(values: RegisterBodyType) {
-    const res = await fetch(
-      `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/register`,
-      {
-        body: JSON.stringify(values),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }
-    )
-      .then((res) => res.json())
-      .catch((error) => {
-        console.log(error);
+    try {
+      const result = await authApiRequest.register(values);
+      toast({
+        description: result.payload.message,
       });
+      await authApiRequest.auth({ sessionToken: result.payload.data.token });
+      router.push("/me");
+    } catch (error: any) {
+      const errors = error.payload.errors as {
+        feild: string;
+        message: string;
+      }[];
+      const status = error.status as number;
+      if (status === 422) {
+        errors.forEach((error) => {
+          form.setError(error.feild as "email" | "password", {
+            type: "server",
+            message: error.message,
+          });
+        });
+        toast({
+          variant: "destructive",
+          description: error.payload.message,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          description: error.payload.message,
+        });
+      }
+    }
   }
 
   // const createAccount = async (data: RegisterBodyType) => {

@@ -1,8 +1,9 @@
 export const POST = async (request: Request) => {
   const res = await request.json();
 
-  const sesstionToken = res.payload?.data?.token;
-  if (!sesstionToken) {
+  const sessionToken = res.sessionToken as string;
+
+  if (!sessionToken) {
     return Response.json(
       { message: "Unable to receive session token" },
       {
@@ -10,10 +11,10 @@ export const POST = async (request: Request) => {
       }
     );
   }
-  return Response.json(res.payload, {
+  return Response.json(res, {
     status: 200,
     headers: {
-      "Set-Cookie": `sessionToken=${sesstionToken}; Path=/; HttpOnly`,
+      "Set-Cookie": `sessionToken=${sessionToken}; Path=/; HttpOnly`,
     },
   });
 };
