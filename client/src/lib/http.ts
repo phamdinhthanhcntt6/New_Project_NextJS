@@ -1,15 +1,44 @@
 import envConfig from "@/config";
 import { LoginResType } from "@/schemaValidations/auth.schema";
 
-type CustomOption = RequestInit & {
+type CustomOption = Omit<RequestInit, "method"> & {
   baseUrl?: string | undefined;
+};
+
+const ENTITY_ERROR_STATUS = 422;
+
+type EntityErrorPayload = {
+  message: string;
+  errors: {
+    feild: string;
+    message: string;
+  }[];
 };
 
 class HttpError extends Error {
   status: number;
-  payload: any;
+  payload: {
+    message: string;
+    [key: string]: any;
+  };
   constructor({ status, payload }: { status: number; payload: any }) {
     super("Http Error");
+    this.status = status;
+    this.payload = payload;
+  }
+}
+
+export class EntityError extends HttpError {
+  status: 422;
+  payload: EntityErrorPayload;
+  constructor({
+    status,
+    payload,
+  }: {
+    status: 422;
+    payload: EntityErrorPayload;
+  }) {
+    super({ status: ENTITY_ERROR_STATUS, payload });
     this.status = status;
     this.payload = payload;
   }
@@ -59,14 +88,25 @@ const request = async <Response>(
     body,
     method,
   });
+
   const payload: Response = await res.json();
+
   const data = {
     status: res.status,
     payload,
   };
+
   if (!res.ok) {
-    throw new HttpError(data);
+    if (res.status === ENTITY_ERROR_STATUS) {
+      throw new EntityError(
+        data as {
+          status: 422;
+          payload: EntityErrorPayload;
+        }
+      );
+    }
   }
+
   if (["/auth/login", "/auth/register"].includes(url)) {
     clientSessionToken.value = (payload as LoginResType).data.token;
   } else if ("/auth/register".includes(url)) {
@@ -79,6 +119,7 @@ const http = {
   get<Response>(url: string, options?: Omit<CustomOption, "body"> | undefined) {
     return request<Response>("GET", url, options);
   },
+
   post<Response>(
     url: string,
     body: any,
@@ -86,6 +127,7 @@ const http = {
   ) {
     return request<Response>("POST", url, { ...options, body });
   },
+
   put<Response>(
     url: string,
     body: any,
@@ -93,6 +135,7 @@ const http = {
   ) {
     return request<Response>("PUT", url, { ...options, body });
   },
+
   delete<Response>(
     url: string,
     body: any,
