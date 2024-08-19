@@ -1,4 +1,5 @@
 import envConfig from "@/config";
+import { normalizePath } from "@/lib/utils";
 import { LoginResType } from "@/schemaValidations/auth.schema";
 
 type CustomOption = Omit<RequestInit, "method"> & {
@@ -15,7 +16,7 @@ type EntityErrorPayload = {
   }[];
 };
 
-class HttpError extends Error {
+export class HttpError extends Error {
   status: number;
   payload: {
     message: string;
@@ -46,9 +47,11 @@ export class EntityError extends HttpError {
 
 class SessionToken {
   private token = "";
+
   get value() {
     return this.token;
   }
+
   set value(token: string) {
     if (typeof window === "undefined") {
       throw new Error("Cannot set token on server side");
@@ -65,12 +68,14 @@ const request = async <Response>(
   options?: CustomOption | undefined
 ) => {
   const body = options?.body ? JSON.stringify(options?.body) : undefined;
+
   const baseHeader = {
     "Content-Type": "application/json",
     Authorization: clientSessionToken.value
       ? `Bearer ${clientSessionToken.value}`
       : "",
   };
+
   const baseUrl =
     options?.baseUrl === undefined
       ? envConfig.NEXT_PUBLIC_API_ENDPOINT
@@ -79,6 +84,7 @@ const request = async <Response>(
   const fullUrl = url.startsWith("/")
     ? `${baseUrl}${url}`
     : `${baseUrl}/${url}`;
+
   const res = await fetch(fullUrl, {
     ...options,
     headers: {
@@ -107,10 +113,16 @@ const request = async <Response>(
     }
   }
 
-  if (["/auth/login", "/auth/register"].includes(url)) {
-    clientSessionToken.value = (payload as LoginResType).data.token;
-  } else if ("/auth/register".includes(url)) {
-    clientSessionToken.value = "";
+  if (typeof window !== "undefined") {
+    if (
+      ["auth/login", "auth/register"].some(
+        (item) => item === normalizePath(url)
+      )
+    ) {
+      clientSessionToken.value = (payload as LoginResType).data.token;
+    } else if ("auth/register" === normalizePath(url)) {
+      clientSessionToken.value = "";
+    }
   }
   return data;
 };

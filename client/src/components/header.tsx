@@ -1,3 +1,4 @@
+import ButtonLoguot from "@/components/button-logout";
 import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
 
@@ -10,6 +11,9 @@ const Header = () => {
         </li>
         <li>
           <Link href={"/register"}>Register</Link>
+        </li>
+        <li>
+          <ButtonLoguot />
         </li>
       </ul>
       <ModeToggle />

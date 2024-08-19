@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { clientSessionToken } from "@/lib/http";
 import { handleErrorApi } from "@/lib/utils";
 import {
   RegisterBody,
@@ -35,6 +34,7 @@ const RegisterForm = () => {
   });
 
   const { toast } = useToast();
+
   const router = useRouter();
 
   async function onSubmit(values: RegisterBodyType) {

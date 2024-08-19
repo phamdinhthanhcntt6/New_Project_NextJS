@@ -1,6 +1,5 @@
 import accountApiRequest from "@/apiRequest/account";
 import Profile from "@/app/me/profile";
-import envConfig from "@/config";
 import { cookies } from "next/headers";
 
 const MyProfilePage = async () => {
@@ -11,7 +10,7 @@ const MyProfilePage = async () => {
 
   return (
     <div className="flex flex-col">
-      <span>{result.payload.data.name}</span>
+      <span>{result.payload?.data?.name}</span>
       <Profile />
     </div>
   );

@@ -1,11 +1,11 @@
 import { AppProvider } from "@/app/AppProvider";
 import { ThemeProvider } from "@/components/theme-provider";
-import Header from "@/components/ui/header";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
+import Header from "@/components/header";
 
 const inter = Inter({ subsets: ["latin"] });
 
