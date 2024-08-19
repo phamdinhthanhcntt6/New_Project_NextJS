@@ -14,11 +14,12 @@ import { useToast } from "@/components/ui/use-toast";
 import envConfig from "@/config";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { cookies } from "next/headers";
 import { useForm } from "react-hook-form";
 
 const LoginForm = () => {
   const { toast } = useToast();
-  const { setSessionToken } = useAppContext();
+  const { setSessionToken, sessionToken } = useAppContext();
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -52,8 +53,27 @@ const LoginForm = () => {
       toast({
         description: result.payload.message,
       });
+      const resultFromNextServer = await fetch("/api/auth", {
+        method: "POST",
+        body: JSON.stringify(result),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then(async (res) => {
+        const payload = await res.json();
+        const data = {
+          status: res.status,
+          payload,
+        };
+        if (!res.ok) {
+          throw data;
+        }
+        return data;
+      });
 
-      setSessionToken(result.payload.data.token);
+      setSessionToken(resultFromNextServer.payload.data.token);
+
+      console.log(sessionToken);
     } catch (error: any) {
       const errors = error.payload.errors as {
         feild: string;
