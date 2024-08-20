@@ -58,7 +58,7 @@ const LoginForm = () => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-2 w-1/3 flex flex-col mx-auto justify-center max-md:w-full"
+          className="space-y-2 w-1/4 flex flex-col mx-auto justify-center max-md:w-full min-w-96"
         >
           <FormField
             control={form.control}

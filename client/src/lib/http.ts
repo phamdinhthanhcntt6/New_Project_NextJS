@@ -1,12 +1,16 @@
 import envConfig from "@/config";
 import { normalizePath } from "@/lib/utils";
 import { LoginResType } from "@/schemaValidations/auth.schema";
+import { redirect } from "next/navigation";
 
 type CustomOption = Omit<RequestInit, "method"> & {
   baseUrl?: string | undefined;
 };
 
 const ENTITY_ERROR_STATUS = 422;
+const AUTHENTICATION_ERROR_STATUS = 401;
+
+const isClient = typeof window !== "undefined";
 
 type EntityErrorPayload = {
   message: string;
@@ -62,6 +66,8 @@ class SessionToken {
 
 export const clientSessionToken = new SessionToken();
 
+let clientLogoutRequest: null | Promise<any> = null;
+
 const request = async <Response>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
@@ -69,7 +75,7 @@ const request = async <Response>(
 ) => {
   const body = options?.body ? JSON.stringify(options?.body) : undefined;
 
-  const baseHeader = {
+  const baseHeaders = {
     "Content-Type": "application/json",
     Authorization: clientSessionToken.value
       ? `Bearer ${clientSessionToken.value}`
@@ -88,7 +94,7 @@ const request = async <Response>(
   const res = await fetch(fullUrl, {
     ...options,
     headers: {
-      ...baseHeader,
+      ...baseHeaders,
       ...options?.headers,
     },
     body,
@@ -110,6 +116,30 @@ const request = async <Response>(
           payload: EntityErrorPayload;
         }
       );
+    } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
+      if (typeof window !== "undefined") {
+        if (!clientLogoutRequest) {
+          clientLogoutRequest = fetch("/api/auth/logout", {
+            method: "POST",
+            body: JSON.stringify({ force: true }),
+            headers: {
+              ...baseHeaders,
+            },
+          });
+
+          await clientLogoutRequest;
+          clientSessionToken.value = "";
+          clientLogoutRequest = null;
+          location.href = "/login";
+        }
+      } else {
+        const sessionToken = (options?.headers as any)?.Authorization.split(
+          "Bearer "
+        )[1];
+        redirect(`/logout?sessionToken=${sessionToken}`);
+      }
+    } else {
+      throw new HttpError(data);
     }
   }
 

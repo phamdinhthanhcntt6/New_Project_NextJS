@@ -76,14 +76,14 @@ const RegisterForm = () => {
   // };
 
   return (
-    <div className="w-full flex flex-col max-md:p-4">
+    <div className="w-full flex flex-col max-md:p-1">
       <span className="text-center font-bold text-2xl text-[#272E3F]">
         Register
       </span>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-2 w-1/3 flex flex-col mx-auto justify-center max-md:w-full "
+          className="space-y-2 w-1/4 flex flex-col mx-auto justify-center max-md:w-full min-w-96 max-md:max-w-11 "
         >
           <FormField
             control={form.control}

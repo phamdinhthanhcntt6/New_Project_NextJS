@@ -11,7 +11,7 @@ const MyProfilePage = async () => {
   return (
     <div className="flex flex-col">
       <span>{result.payload?.data?.name}</span>
-      <Profile />
+      {/* <Profile /> */}
     </div>
   );
 };
