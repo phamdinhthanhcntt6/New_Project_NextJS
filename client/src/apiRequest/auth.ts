@@ -3,6 +3,7 @@ import {
   LoginBodyType,
   LoginResType,
   RegisterResType,
+  SlideSessionResType,
 } from "@/schemaValidations/auth.schema";
 import { MessageResType } from "@/schemaValidations/common.schema";
 import { Register } from "@tanstack/react-query";
@@ -11,7 +12,7 @@ const authApiRequest = {
   login: (body: LoginBodyType) => http.post<LoginResType>("/auth/login", body),
   register: (body: Register) =>
     http.post<RegisterResType>("/auth/register", body),
-  auth: (body: { sessionToken: string }) =>
+  auth: (body: { sessionToken: string; expiresAt: string }) =>
     http.post("/api/auth", body, {
       baseUrl: "",
     }),
@@ -34,5 +35,23 @@ const authApiRequest = {
       { force },
       { baseUrl: "", signal }
     ),
+  slideSessionFromNextServerToServer: (sessionToken: string) =>
+    http.post<SlideSessionResType>(
+      "/auth/slide-session",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    ),
+
+  slideSessionFromNextClientToNextServer: () =>
+    http.post<SlideSessionResType>(
+      "/api/auth/slide-session",
+      {},
+      { baseUrl: "" }
+    ),
 };
+
 export default authApiRequest;
