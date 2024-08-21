@@ -42,10 +42,12 @@ const RegisterForm = () => {
     setLoading(true);
     try {
       const result = await authApiRequest.register(values);
+
       await authApiRequest.auth({
         sessionToken: result.payload.data.token,
         expiresAt: result.payload.data.expiresAt,
       });
+
       toast({
         description: result.payload.message,
       });
@@ -101,6 +103,7 @@ const RegisterForm = () => {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="email"
@@ -114,6 +117,7 @@ const RegisterForm = () => {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="password"
@@ -127,6 +131,7 @@ const RegisterForm = () => {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="confirmPassword"

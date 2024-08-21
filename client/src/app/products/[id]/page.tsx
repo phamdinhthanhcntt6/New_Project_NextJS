@@ -1,19 +1,19 @@
 import productApiRequest from "@/apiRequest/product";
+import ProductForm from "@/app/products/_components/product-form";
 
 const ProductDetailPage = async ({ params }: { params: { id: string } }) => {
-  let product = null;
+  let product = undefined;
   try {
     const { payload } = await productApiRequest.getProductDetail(
       Number(params.id)
     );
     product = payload.data;
-    console.log(product);
   } catch (error) {}
 
   return (
     <div>
       {!product && <div>No data</div>}
-      {product && <div>{product.name}</div>}
+      <ProductForm product={product} />
     </div>
   );
 };

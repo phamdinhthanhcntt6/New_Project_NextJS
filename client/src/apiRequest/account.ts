@@ -5,13 +5,13 @@ import {
 } from "@/schemaValidations/account.schema";
 
 const accountApiRequest = {
-  me: (sessionToken: string) =>
+  getMyProfile: (sessionToken: string) =>
     http.get<AccountResType>("/account/me", {
       headers: {
         Authorization: `Bearer ${sessionToken}`,
       },
     }),
-  meClient: () => http.get<AccountResType>("/account/me"),
+  getMyProfileClient: () => http.get<AccountResType>("/account/me"),
   updateProfile: (body: UpdateMeBodyType) =>
     http.put<AccountResType>("account/me", body),
 };

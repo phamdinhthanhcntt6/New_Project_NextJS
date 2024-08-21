@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const ProductPage = async () => {
-  const { payload } = await productApiRequest.getList();
+  const { payload } = await productApiRequest.getProductList();
   const productList = payload.data;
   return (
     <div className="flex flex-col">

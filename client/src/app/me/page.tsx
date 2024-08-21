@@ -7,7 +7,9 @@ const MyProfilePage = async () => {
   const cookieStore = cookies();
   const sessionToken = cookieStore.get("sessionToken");
 
-  const result = await accountApiRequest.me(sessionToken?.value ?? "");
+  const result = await accountApiRequest.getMyProfile(
+    sessionToken?.value ?? ""
+  );
 
   return (
     <div className="flex flex-col">

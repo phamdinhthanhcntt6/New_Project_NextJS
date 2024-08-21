@@ -16,6 +16,7 @@ import { handleErrorApi } from "@/lib/utils";
 import {
   CreateProductBody,
   CreateProductBodyType,
+  ProductResType,
 } from "@/schemaValidations/product.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -23,7 +24,9 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
-const AddProductForm = () => {
+type Product = ProductResType["data"];
+
+const ProductForm = ({ product }: { product?: Product }) => {
   const [file, setFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
@@ -33,30 +36,31 @@ const AddProductForm = () => {
   const form = useForm<CreateProductBodyType>({
     resolver: zodResolver(CreateProductBody),
     defaultValues: {
-      name: "",
-      price: 0,
-      description: "",
-      image: "",
+      name: product?.name ?? "",
+      price: product?.price ?? 0,
+      description: product?.description ?? "",
+      image: product?.image ?? "",
     },
   });
 
   const image = form.watch("image");
 
-  async function onSubmit(values: CreateProductBodyType) {
-    if (loading) return;
+  const createProduct = async (values: CreateProductBodyType) => {
     setLoading(true);
     try {
       const formData = new FormData();
       formData.append("file", file as Blob);
       const uploadImageResult = productApiRequest.uploadImage(formData);
       const imageUrl = (await uploadImageResult).payload.data;
-      const result = await productApiRequest.create({
+      const result = await productApiRequest.createProduct({
         ...values,
         image: imageUrl,
       });
+
       toast({
         description: result.payload.message,
       });
+
       router.push("/products");
     } catch (error: any) {
       handleErrorApi({
@@ -66,12 +70,47 @@ const AddProductForm = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateProduct = async (values: CreateProductBodyType) => {
+    if (!product) return;
+    setLoading(true);
+    try {
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file as Blob);
+        const uploadImageResult = productApiRequest.uploadImage(formData);
+        const imageUrl = (await uploadImageResult).payload.data;
+        values = {
+          ...values,
+          image: imageUrl,
+        };
+      }
+
+      const result = await productApiRequest.updateProduct(product?.id, values);
+
+      toast({
+        description: result.payload.message,
+      });
+    } catch (error: any) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  async function onSubmit(values: CreateProductBodyType) {
+    if (loading) return;
+    product ? await updateProduct(values) : await createProduct(values);
   }
 
   return (
     <div className="w-full flex flex-col max-md:p-4">
       <span className="text-center font-bold text-2xl text-[#272E3F]">
-        Add New Product
+        {product ? "Edit Product" : "Add New Product"}
       </span>
       <Form {...form}>
         <form
@@ -91,6 +130,7 @@ const AddProductForm = () => {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="price"
@@ -104,6 +144,7 @@ const AddProductForm = () => {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="description"
@@ -117,6 +158,7 @@ const AddProductForm = () => {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="image"
@@ -168,7 +210,7 @@ const AddProductForm = () => {
             </div>
           )}
           <Button type="submit" size={"sm"} className="px-10 mx-auto !mt-8">
-            Add New Product
+            {product ? "Confirm Edit Product" : "Add New Product"}
           </Button>
         </form>
       </Form>
@@ -176,4 +218,4 @@ const AddProductForm = () => {
   );
 };
 
-export default AddProductForm;
+export default ProductForm;
