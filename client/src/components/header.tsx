@@ -7,9 +7,6 @@ const Header = () => {
     <div className="flex w-full justify-between">
       <ul className="flex gap-10">
         <li>
-          <Link href={"/products/add"}>Add new product</Link>
-        </li>
-        <li>
           <Link href={"/products"}>Product</Link>
         </li>
         <li>
