@@ -1,4 +1,3 @@
-import { AppProvider } from "@/app/AppProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
@@ -7,6 +6,7 @@ import { cookies } from "next/headers";
 import "./globals.css";
 import Header from "@/components/header";
 import SlideSession from "@/components/slide-session";
+import { AppProvider } from "@/app/app-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
