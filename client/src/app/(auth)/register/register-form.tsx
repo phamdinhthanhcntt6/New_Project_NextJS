@@ -144,7 +144,7 @@ const RegisterForm = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-32 mx-auto !mt-8">
+          <Button type="submit" className="px-10 mx-auto !mt-8">
             Register
           </Button>
         </form>

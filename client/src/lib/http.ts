@@ -85,14 +85,25 @@ const request = async <Response>(
   url: string,
   options?: CustomOption | undefined
 ) => {
-  const body = options?.body ? JSON.stringify(options?.body) : undefined;
+  const body = options?.body
+    ? options.body instanceof FormData
+      ? options?.body
+      : JSON.stringify(options?.body)
+    : undefined;
 
-  const baseHeaders = {
-    "Content-Type": "application/json",
-    Authorization: clientSessionToken.value
-      ? `Bearer ${clientSessionToken.value}`
-      : "",
-  };
+  const baseHeaders =
+    body instanceof FormData
+      ? {
+          Authorization: clientSessionToken.value
+            ? `Bearer ${clientSessionToken.value}`
+            : "",
+        }
+      : {
+          "Content-Type": "application/json",
+          Authorization: clientSessionToken.value
+            ? `Bearer ${clientSessionToken.value}`
+            : "",
+        };
 
   const baseUrl =
     options?.baseUrl === undefined
@@ -108,7 +119,7 @@ const request = async <Response>(
     headers: {
       ...baseHeaders,
       ...options?.headers,
-    },
+    } as any,
     body,
     method,
   });
@@ -152,7 +163,7 @@ const request = async <Response>(
         redirect(`/logout?sessionToken=${sessionToken}`);
       }
     } else {
-      // throw new HttpError(data);
+      throw new HttpError(data);
     }
   }
 

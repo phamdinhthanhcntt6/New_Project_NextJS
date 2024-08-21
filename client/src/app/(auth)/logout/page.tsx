@@ -24,7 +24,7 @@ const LogoutPage = () => {
     }
 
     return () => {
-      //   controller.abort();
+      controller.abort();
     };
   }, [sessionToken, pathname, router]);
 
