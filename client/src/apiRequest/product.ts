@@ -1,4 +1,5 @@
 import http from "@/lib/http";
+import { MessageResType } from "@/schemaValidations/common.schema";
 import {
   CreateProductBodyType,
   ProductListResType,
@@ -7,7 +8,8 @@ import {
 } from "@/schemaValidations/product.schema";
 
 const productApiRequest = {
-  getProductList: () => http.get<ProductListResType>("/products"),
+  getProductList: () =>
+    http.get<ProductListResType>("/products", { cache: "no-store" }),
   getProductDetail: (id: number) =>
     http.get<ProductResType>(`/products/${id}`, { cache: "no-store" }),
   createProduct: (body: CreateProductBodyType) =>
@@ -19,6 +21,7 @@ const productApiRequest = {
     }>("/media/upload", body),
   updateProduct: (id: number, body: UpdateProductBodyType) =>
     http.put<ProductResType>(`/products/${id}`, body),
+  deleteProduct: (id: number) => http.delete<MessageResType>(`/products/${id}`),
 };
 
 export default productApiRequest;

@@ -1,4 +1,5 @@
 import productApiRequest from "@/apiRequest/product";
+import DeleteProductButton from "@/app/products/_components/delete-product-button";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,7 +28,7 @@ const ProductPage = async () => {
               <Link href={`/products/${product.id}`}>
                 <Button variant={"outline"}>Edit</Button>
               </Link>
-              <Button variant={"destructive"}>Delete</Button>
+              <DeleteProductButton product={product} />
             </div>
           </div>
         ))}

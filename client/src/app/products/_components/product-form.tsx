@@ -62,6 +62,7 @@ const ProductForm = ({ product }: { product?: Product }) => {
       });
 
       router.push("/products");
+      router.refresh();
     } catch (error: any) {
       handleErrorApi({
         error,

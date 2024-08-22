@@ -206,10 +206,9 @@ const http = {
 
   delete<Response>(
     url: string,
-    body: any,
     options?: Omit<CustomOption, "body"> | undefined
   ) {
-    return request<Response>("DELETE", url, { ...options, body });
+    return request<Response>("DELETE", url, { ...options });
   },
 };
 
