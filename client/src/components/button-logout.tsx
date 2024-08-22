@@ -1,24 +1,32 @@
 "use client";
 
 import authApiRequest from "@/apiRequest/auth";
+import { useAppContext } from "@/app/app-provider";
 import { Button } from "@/components/ui/button";
 import { handleErrorApi } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 
-const ButtonLoguot = () => {
-  const route = useRouter();
+const ButtonLogout = () => {
+  const { user } = useAppContext();
+  console.log(user);
+  const router = useRouter();
   const pathName = usePathname();
   const handleLogout = async () => {
     try {
       authApiRequest.logoutFromNextClientToNextServer();
-      route.push("/login");
+      router.refresh();
+      router.push("/login");
     } catch (error) {
       handleErrorApi({ error });
       authApiRequest.logoutFromNextClientToNextServer(true).then((res) => {
-        route.push(`/login?redirectFrom=${pathName}`);
+        router.push(`/login?redirectFrom=${pathName}`);
+        router.refresh();
       });
+    } finally {
+      router.refresh();
     }
   };
+
   return (
     <>
       <Button size={"lg"} onClick={handleLogout}>
@@ -27,4 +35,4 @@ const ButtonLoguot = () => {
     </>
   );
 };
-export default ButtonLoguot;
+export default ButtonLogout;
