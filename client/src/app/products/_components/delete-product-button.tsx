@@ -38,7 +38,7 @@ const DeleteProductButton = ({ product }: { product: Product }) => {
   return (
     <div className="-mt">
       <AlertDialog>
-        <AlertDialogTrigger>
+        <AlertDialogTrigger asChild>
           <Button variant={"destructive"}>Delete</Button>
         </AlertDialogTrigger>
         <AlertDialogContent>

@@ -1,7 +1,12 @@
 import accountApiRequest from "@/apiRequest/account";
-import Profile from "@/app/me/profile";
 import ProfileForm from "@/app/me/profile-form";
 import { cookies } from "next/headers";
+
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "My Profile",
+};
 
 const MyProfilePage = async () => {
   const cookieStore = cookies();
@@ -18,4 +23,5 @@ const MyProfilePage = async () => {
     </div>
   );
 };
+
 export default MyProfilePage;

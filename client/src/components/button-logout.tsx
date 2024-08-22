@@ -8,19 +8,17 @@ import { usePathname, useRouter } from "next/navigation";
 
 const ButtonLogout = () => {
   const { user } = useAppContext();
-  console.log(user);
+
   const router = useRouter();
   const pathName = usePathname();
   const handleLogout = async () => {
     try {
       authApiRequest.logoutFromNextClientToNextServer();
-      router.refresh();
       router.push("/login");
     } catch (error) {
       handleErrorApi({ error });
       authApiRequest.logoutFromNextClientToNextServer(true).then((res) => {
         router.push(`/login?redirectFrom=${pathName}`);
-        router.refresh();
       });
     } finally {
       router.refresh();

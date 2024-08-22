@@ -3,7 +3,7 @@
 import authApiRequest from "@/apiRequest/auth";
 import { clientSessionToken } from "@/lib/http";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 
 const LogoutPage = () => {
   const router = useRouter();
@@ -28,6 +28,6 @@ const LogoutPage = () => {
     };
   }, [sessionToken, pathname, router]);
 
-  return <Suspense>LogoutPage</Suspense>;
+  return <>LogoutPage</>;
 };
 export default LogoutPage;

@@ -5,6 +5,12 @@ import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Product List",
+};
+
 const ProductPage = async () => {
   const cookieStore = cookies();
   const sessionToken = cookieStore.get("sessionToken");
@@ -23,18 +29,20 @@ const ProductPage = async () => {
       <div className="flex gap-4 flex-col">
         {productList.map((product) => (
           <div key={product.id} className="flex gap-5">
-            <Image
-              src={product.image}
-              alt={product.name}
-              height={100}
-              width={100}
-            />
+            <Link href={`/products/${product.id}`}>
+              <Image
+                src={product.image}
+                alt={product.name}
+                height={100}
+                width={100}
+              />
+            </Link>
             <span className="font-medium">{product.name}</span>
             <span>{product.price}$</span>
             <div className="flex gap-2">
               {isAuthenticated && (
                 <>
-                  <Link href={`/products/${product.id}`}>
+                  <Link href={`/products/${product.id}/edit`}>
                     <Button variant={"outline"}>Edit</Button>
                   </Link>
                   <DeleteProductButton product={product} />
@@ -47,4 +55,5 @@ const ProductPage = async () => {
     </div>
   );
 };
+
 export default ProductPage;
